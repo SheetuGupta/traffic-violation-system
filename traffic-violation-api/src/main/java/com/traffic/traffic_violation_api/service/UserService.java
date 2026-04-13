@@ -32,21 +32,16 @@ public class UserService {
     //update
     public User updateUser(Long id, User newUser) {
 
-        User existingUser = userRepository.findById(id).orElse(null);
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (existingUser != null) {
-            existingUser.setName(newUser.getName());
-            existingUser.setEmail(newUser.getEmail());
-            existingUser.setPassword(newUser.getPassword());
-            existingUser.setRole(newUser.getRole());
-            existingUser.setPhoneNumber(newUser.getPhoneNumber());
+        existingUser.setName(newUser.getName());
+        existingUser.setEmail(newUser.getEmail());
+        existingUser.setPassword(newUser.getPassword());
+        existingUser.setRole(newUser.getRole());
+        existingUser.setPhoneNumber(newUser.getPhoneNumber());
 
-            return userRepository.save(existingUser);
-        }
-
-        return null;
+        return userRepository.save(existingUser);
     }
-
-
 
 }
