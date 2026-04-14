@@ -1,4 +1,5 @@
 package com.traffic.traffic_violation_api.entity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +11,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name="users")
 @Getter
@@ -36,6 +39,7 @@ public class User {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
 
 
 
