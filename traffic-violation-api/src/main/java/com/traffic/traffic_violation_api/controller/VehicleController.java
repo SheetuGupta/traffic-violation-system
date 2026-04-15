@@ -24,4 +24,6 @@ public class VehicleController {
     public List<Vehicle> getVehiclesByUser(@PathVariable Long userId){
         return vehicleService.getVehiclesByUserId(userId);
     }
+
+
 }

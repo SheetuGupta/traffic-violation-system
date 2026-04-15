@@ -24,8 +24,12 @@ public class Violation {
 
     private String violationType;
     private Double fineAmount;
+    private String status;
     private LocalDateTime violationDate;
 
     private Long vehicleId;
+
+
+
 
 }
