@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/vehicles")
 public class VehicleController {
-
     @Autowired
     private VehicleService vehicleService;
 
@@ -19,11 +19,8 @@ public class VehicleController {
         return vehicleService.saveVehicle(vehicle);
     }
 
-
     @GetMapping("/user/{userId}")
-    public List<Vehicle> getVehiclesByUser(@PathVariable Long userId){
+    public List<Vehicle> getVehiclesByUser(@PathVariable Long userId) {
         return vehicleService.getVehiclesByUserId(userId);
     }
-
-
 }

@@ -1,0 +1,35 @@
+  # OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# Node
+node_modules/
+
+# Build output
+**/target/
+**/build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# IDE / editor
+.vscode/
+.idea/
+*.iml
+
+# Application uploads and runtime data
+traffic-violation-api/uploads/
+
+# Frontend local files
+traffic-violation-api/frontend/node_modules/
+traffic-violation-api/frontend/build/
+traffic-violation-api/frontend/.env
+traffic-violation-api/frontend/.env.*

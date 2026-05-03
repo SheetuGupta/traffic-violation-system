@@ -5,11 +5,13 @@ import com.traffic.traffic_violation_api.service.ViolationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/violations")
 public class ViolationController {
@@ -19,44 +21,64 @@ public class ViolationController {
 
     // CREATE
     @PostMapping
-    public Violation createViolation(@RequestBody Violation violation){
+    public Violation createViolation(@RequestBody Violation violation) {
         return violationService.saveViolation(violation);
     }
 
-    // GET BY VEHICLE
-    @GetMapping("/vehicle/{vehicleId}")
-    public List<Violation> getViolationsByVehicle(@PathVariable Long vehicleId){
-        return violationService.getViolationsByVehicleId(vehicleId);
+    // GET ALL
+    @GetMapping
+    public List<Violation> getAllViolations() {
+        return violationService.getAllViolations();
     }
 
-    // TOTAL FINE BY VEHICLE
-    @GetMapping("/vehicle/{vehicleId}/total-fine")
-    public Map<String, Double> getTotalFine(@PathVariable Long vehicleId){
-
-        Double total = violationService.getTotalFineByVehicle(vehicleId);
-
-        Map<String, Double> response = new HashMap<>();
-        response.put("totalFine", total);
-
-        return response;
+    // GET BY VEHICLE NUMBER
+    @GetMapping("/vehicle-number/{vehicleNumber}")
+    public List<Violation> getByVehicleNumber(@PathVariable String vehicleNumber) {
+        return violationService.getViolationsByVehicleNumber(vehicleNumber);
     }
 
-    // GET BY USER
+    // TOTAL FINE BY VEHICLE NUMBER
+    @GetMapping("/vehicle-number/{vehicleNumber}/total-fine")
+    public Map<String, Double> getTotalFineByVehicleNumber(@PathVariable String vehicleNumber) {
+        return Map.of("totalFine", violationService.getTotalFineByVehicleNumber(vehicleNumber));
+    }
+
+    // VEHICLE DETAIL — violations list + total fine (frontend modal ke liye)
+    @GetMapping("/vehicle-detail/{vehicleNumber}")
+    public Map<String, Object> getVehicleDetail(@PathVariable String vehicleNumber) {
+        return violationService.getVehicleDetail(vehicleNumber);
+    }
+
+    // GET BY USER REGISTERED VEHICLES
     @GetMapping("/user/{userId}")
-    public List<Violation> getViolationsByUser(@PathVariable Long userId){
+    public List<Violation> getViolationsByUser(@PathVariable Long userId) {
         return violationService.getViolationsByUserId(userId);
     }
 
-    // TOTAL FINE BY USER
     @GetMapping("/user/{userId}/total-fine")
-    public Map<String, Double> getTotalFineByUser(@PathVariable Long userId){
+    public Map<String, Double> getTotalFineByUser(@PathVariable Long userId) {
+        return Map.of("totalFine", violationService.getTotalFineByUser(userId));
+    }
 
-        Double total = violationService.getTotalFineByUser(userId);
+    // FILED BY USER
+    @GetMapping("/reporter/{reporterId}")
+    public List<Violation> getByReporterId(@PathVariable Long reporterId) {
+        return violationService.getViolationsByReporterId(reporterId);
+    }
 
-        Map<String, Double> response = new HashMap<>();
-        response.put("totalFine", total);
+    @GetMapping("/filed-by/{reporterId}")
+    public List<Violation> getFiledByReporterId(@PathVariable Long reporterId) {
+        return violationService.getViolationsByReporterId(reporterId);
+    }
 
-        return response;
+    @GetMapping("/reporter-email/{reporterEmail}")
+    public List<Violation> getByReporterEmail(@PathVariable String reporterEmail) {
+        return violationService.getViolationsByReporterEmail(reporterEmail);
+    }
+
+    @GetMapping("/filed-by-email")
+    public List<Violation> getFiledByReporterEmail(@RequestParam String email) {
+        return violationService.getViolationsByReporterEmail(email);
     }
 
     // FILTER BY STATUS
@@ -72,31 +94,48 @@ public class ViolationController {
             @RequestParam int size,
             @RequestParam String sortBy,
             @RequestParam String direction) {
-
         return violationService.getViolations(page, size, sortBy, direction);
     }
 
     // TOTAL SYSTEM FINE
     @GetMapping("/total-fine")
     public Map<String, Double> getTotalSystemFine() {
-
-        Double total = violationService.getTotalSystemFine();
-
-        Map<String, Double> response = new HashMap<>();
-        response.put("totalFine", total);
-
-        return response;
+        return Map.of("totalFine", violationService.getTotalSystemFine());
     }
 
     // TOP VIOLATOR
-    @GetMapping("/top-violator")
-    public Map<String, Long> getTopViolator() {
+    // Removed as Vehicle entity is no longer used
 
-        Long userId = violationService.getTopViolator();
+    // UPLOAD WITH IMAGE
+    @PostMapping("/upload")
+    public Violation uploadViolation(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam String violationType,
+            @RequestParam Double fineAmount,
+            @RequestParam String vehicleNumber,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long reporterId,
+            @RequestParam(required = false) String reporterName,
+            @RequestParam(required = false) String reporterEmail
+    ) throws IOException {
+        return violationService.saveViolationWithImage(
+                file, violationType, fineAmount, vehicleNumber, location, reporterId, reporterName, reporterEmail
+        );
+    }
 
-        Map<String, Long> response = new HashMap<>();
-        response.put("topViolatorUserId", userId);
+    // BULK UPDATE
+    @PutMapping("/bulk-status")
+    public Map<String, String> bulkUpdateStatus(@RequestBody Map<String, Object> payload) {
+        List<Integer> intIds = (List<Integer>) payload.get("ids");
+        List<Long> ids = intIds.stream().map(Integer::longValue).toList();
+        String status = (String) payload.get("status");
+        violationService.bulkUpdateStatus(ids, status);
+        return Map.of("message", "Bulk update successful");
+    }
 
-        return response;
+    // ASSIGN OFFICER
+    @PutMapping("/{id}/assign-officer")
+    public Violation assignOfficer(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        return violationService.assignOfficer(id, payload.get("officerName"));
     }
 }
