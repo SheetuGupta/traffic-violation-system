@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:frontend": "cd traffic-violation-api/frontend && npm start",
+    "start:backend": "cd traffic-violation-api && mvn spring-boot:run",
+    "start": "start cmd /k npm run start:backend && start cmd /k npm run start:frontend"
   },
   "repository": {
     "type": "git",

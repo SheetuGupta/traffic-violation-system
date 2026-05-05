@@ -21,7 +21,7 @@ public class Violation {
     private LocalDateTime violationDate;
     private String location;
 
-    private String vehicleNumber; // ✅ SIRF YAHI — vehicleId HATA DIYA
+    private String vehicleNumber; 
     private String assignedOfficer;
     private Long reporterId;
     private String reporterName;
